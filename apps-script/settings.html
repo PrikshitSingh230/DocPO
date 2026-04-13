@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body{font-family:Arial,sans-serif;font-size:13px;padding:14px;margin:0}
+      h3{margin:0 0 4px}
+      .note{font-size:11px;color:#888;margin-bottom:12px}
+      label{display:block;margin-top:10px;font-weight:bold;font-size:12px}
+      input[type="text"],input[type="number"],input[type="color"]{width:100%;padding:4px;box-sizing:border-box;margin-top:3px;border:1px solid #ccc;border-radius:3px}
+      input[type="checkbox"]{margin-right:6px}
+      .row{display:flex;gap:8px}
+      .row>div{flex:1}
+      .card{border:1px solid #ddd;border-radius:6px;padding:10px;margin-top:10px}
+      .sub{font-size:12px;font-weight:bold;margin-bottom:8px;color:#333}
+      .inlineChecks{display:flex;gap:14px;align-items:center;margin-top:8px;flex-wrap:wrap}
+      button{margin-top:16px;width:100%;padding:9px;background:#4b4d9f;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px}
+      button:hover{background:#3a3b80}
+    </style>
+  </head>
+  <body>
+    <h3>DocPo settings</h3>
+    <p class="note">Changes apply to this run only.</p>
+
+    <label>Font family<input id="ff" value="<?= config.fontFamily ?>"></label>
+
+    <div class="row">
+      <div><label>Body pt<input type="number" id="bs" value="<?= config.bodyFontSize ?>"></label></div>
+      <div><label>Body color<input type="color" id="bc" value="<?= config.bodyColor ?>"></label></div>
+    </div>
+
+    <div class="card">
+      <div class="sub">Heading 1</div>
+      <div class="row">
+        <div><label>H1 pt<input type="number" id="h1" value="<?= config.h1Size ?>"></label></div>
+        <div><label>H1 color picker<input type="color" id="h1c" value="<?= config.h1Color || config.headingColor ?>" oninput="syncColorToHex('h1c','h1hex')"></label></div>
+        <div><label>H1 hex code<input type="text" id="h1hex" value="<?= config.h1Color || config.headingColor ?>" oninput="syncHexToColor('h1hex','h1c')"></label></div>
+      </div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="h1b" <?= config.h1Bold ? 'checked' : '' ?>>Bold</label>
+        <label><input type="checkbox" id="h1u" <?= config.h1Underline ? 'checked' : '' ?>>Underline</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sub">Heading 2</div>
+      <div class="row">
+        <div><label>H2 pt<input type="number" id="h2" value="<?= config.h2Size ?>"></label></div>
+        <div><label>H2 color picker<input type="color" id="h2c" value="<?= config.h2Color || config.headingColor ?>" oninput="syncColorToHex('h2c','h2hex')"></label></div>
+        <div><label>H2 hex code<input type="text" id="h2hex" value="<?= config.h2Color || config.headingColor ?>" oninput="syncHexToColor('h2hex','h2c')"></label></div>
+      </div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="h2b" <?= config.h2Bold ? 'checked' : '' ?>>Bold</label>
+        <label><input type="checkbox" id="h2u" <?= config.h2Underline ? 'checked' : '' ?>>Underline</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sub">Heading 3</div>
+      <div class="row">
+        <div><label>H3 pt<input type="number" id="h3" value="<?= config.h3Size ?>"></label></div>
+        <div><label>H3 color picker<input type="color" id="h3c" value="<?= config.h3Color || config.headingColor ?>" oninput="syncColorToHex('h3c','h3hex')"></label></div>
+        <div><label>H3 hex code<input type="text" id="h3hex" value="<?= config.h3Color || config.headingColor ?>" oninput="syncHexToColor('h3hex','h3c')"></label></div>
+      </div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="h3b" <?= config.h3Bold ? 'checked' : '' ?>>Bold</label>
+        <label><input type="checkbox" id="h3u" <?= config.h3Underline ? 'checked' : '' ?>>Underline</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div><label>Table header bg<input type="color" id="th" value="<?= config.tableHeaderBg ?>"></label></div>
+      <div><label>Border color<input type="color" id="tbc" value="<?= config.tableBorderColor ?>"></label></div>
+    </div>
+
+    <div class="row">
+      <div><label>Table border width (pt)<input type="number" step="0.1" id="bw" value="<?= config.tableBorderWidth ?>"></label></div>
+      <div><label>Table width padding (pt)<input type="number" step="1" id="twp" value="<?= config.tableWidthPadding ?>"></label></div>
+    </div>
+
+    <div class="card">
+      <div class="sub">Image handling</div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="up" <?= config.upscaleSmallImages ? 'checked' : '' ?>>Upscale small images</label>
+        <label><input type="checkbox" id="rsw" <?= config.resizeStandaloneImagesToTextWidth ? 'checked' : '' ?>>Resize standalone images to text width</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sub">Footnotes</div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="fn" <?= config.enableFootnotes ? 'checked' : '' ?>>Convert footnote placeholders</label>
+      </div>
+      <div class="note" style="margin-top:8px;">Format:</div>
+    </div>
+    
+    <div class="card">
+      <div class="sub">Header logo</div>
+      <div class="inlineChecks">
+        <label><input type="checkbox" id="hl" <?= config.addHeaderLogo ? 'checked' : '' ?>>Add company logo in header</label>
+      </div>
+
+      <label>Header logo Drive file ID
+        <input type="text" id="hlid" value="<?= config.headerLogoDriveFileId || '' ?>">
+      </label>
+
+      <div class="row">
+        <div>
+          <label>Header logo width (px)
+            <input type="number" id="hlw" value="<?= config.headerLogoWidth || 90 ?>">
+          </label>
+        </div>
+        <div>
+          <label>Header logo height (px, optional)
+            <input type="number" id="hlh" value="<?= config.headerLogoHeight || '' ?>">
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Left offset
+            <input type="number" id="hll" value="<?= config.headerLogoLeftOffset || 430 ?>">
+          </label>
+        </div>
+        <div>
+          <label>Top offset
+            <input type="number" id="hlt" value="<?= config.headerLogoTopOffset || -10 ?>">
+          </label>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:8px;">
+        Use offsets to push the logo toward the top-right corner.
+      </div>
+    </div>
+
+    <button onclick="go()">Apply and Format</button>
+
+    <script>
+  function normHex(v){
+    v = (v || "").trim();
+    if (!v) return "";
+    if (v[0] !== "#") v = "#" + v;
+    return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "";
+  }
+
+  function syncColorToHex(colorId, hexId){
+    document.getElementById(hexId).value = document.getElementById(colorId).value;
+  }
+
+  function syncHexToColor(hexId, colorId){
+    var v = normHex(document.getElementById(hexId).value);
+    if (v) {
+      document.getElementById(colorId).value = v;
+      document.getElementById(hexId).value = v;
+    }
+  }
+
+  function go(){
+    try {
+      var h1hex = normHex(document.getElementById("h1hex").value) || document.getElementById("h1c").value;
+      var h2hex = normHex(document.getElementById("h2hex").value) || document.getElementById("h2c").value;
+      var h3hex = normHex(document.getElementById("h3hex").value) || document.getElementById("h3c").value;
+
+      var c = {
+        fontFamily: document.getElementById("ff").value,
+        bodyFontSize: +document.getElementById("bs").value,
+        bodyColor: document.getElementById("bc").value,
+
+        h1Size: +document.getElementById("h1").value,
+        h2Size: +document.getElementById("h2").value,
+        h3Size: +document.getElementById("h3").value,
+
+        h1Color: h1hex,
+        h2Color: h2hex,
+        h3Color: h3hex,
+        headingColor: h1hex,
+
+        h1Bold: document.getElementById("h1b").checked,
+        h2Bold: document.getElementById("h2b").checked,
+        h3Bold: document.getElementById("h3b").checked,
+
+        h1Underline: document.getElementById("h1u").checked,
+        h2Underline: document.getElementById("h2u").checked,
+        h3Underline: document.getElementById("h3u").checked,
+
+        tableHeaderBg: document.getElementById("th").value,
+        tableBorderColor: document.getElementById("tbc").value,
+        tableBorderWidth: +document.getElementById("bw").value,
+        tableWidthPadding: +document.getElementById("twp").value,
+
+        upscaleSmallImages: document.getElementById("up").checked,
+        resizeStandaloneImagesToTextWidth: document.getElementById("rsw").checked,
+        enableFootnotes: document.getElementById("fn").checked,
+
+        addHeaderLogo: document.getElementById("hl").checked,
+        headerLogoDriveFileId: document.getElementById("hlid").value.trim(),
+        headerLogoWidth: document.getElementById("hlw").value ? +document.getElementById("hlw").value : 90,
+        headerLogoHeight: document.getElementById("hlh").value ? +document.getElementById("hlh").value : null,
+        headerLogoLeftOffset: document.getElementById("hll").value ? +document.getElementById("hll").value : 430,
+        headerLogoTopOffset: document.getElementById("hlt").value ? +document.getElementById("hlt").value : -10
+      };
+
+      console.log("Submitting config", c);
+
+      google.script.run
+        .withSuccessHandler(function(){
+          google.script.host.close();
+        })
+        .withFailureHandler(function(e){
+          console.error(e);
+          alert("Error: " + e.message);
+        })
+        .runDocPoWithConfig(c);
+
+    } catch (err) {
+      console.error(err);
+      alert("Settings error: " + err.message);
+    }
+  }
+</script>
