@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocPo Formatter</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fc;
+      color: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== SIDEBAR CONTAINER ===== */
+    .sidebar {
+      width: 100%;
+      max-width: 350px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+      width: 100%;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: -0.3px;
+    }
+    .header h1 span {
+      background: linear-gradient(135deg, #6c63ff, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      font-size: 12.5px;
+      color: #8892a4;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e0e4ed, transparent);
+      margin: 16px 0 24px;
+    }
+
+    /* ===== PANDA STAGE ===== */
+    .panda-stage {
+      position: relative;
+      width: 160px;
+      height: 180px;
+      margin: 0 auto 20px;
+    }
+
+    /* ===== PANDA (CSS only) ===== */
+    .panda {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 110px;
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    /* Head */
+    .panda-head {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72px;
+      height: 66px;
+      background: #fff;
+      border-radius: 50%;
+      border: 2.5px solid #2d2d2d;
+      z-index: 3;
+    }
+
+    /* Ears */
+    .panda-ear {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      background: #2d2d2d;
+      border-radius: 50%;
+      top: -8px;
+      z-index: 2;
+    }
+    .panda-ear.left { left: 2px; }
+    .panda-ear.right { right: 2px; }
+    .panda-ear::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ffc0cb;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Eye patches */
+    .panda-eye-patch {
+      position: absolute;
+      width: 22px;
+      height: 20px;
+      background: #2d2d2d;
+      border-radius: 50%;
+      top: 18px;
+      z-index: 4;
+      transition: all 0.3s ease;
+    }
+    .panda-eye-patch.left {
+      left: 10px;
+      transform: rotate(-8deg);
+    }
+    .panda-eye-patch.right {
+      right: 10px;
+      transform: rotate(8deg);
+    }
+
+    /* Eyes */
+    .panda-eye {
+      position: absolute;
+      width: 8px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      transition: all 0.3s ease;
+    }
+    .panda-eye .pupil {
+      width: 5px;
+      height: 6px;
+      background: #111;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.3s ease;
+    }
+    .panda-eye .pupil::after {
+      content: '';
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 1px;
+      right: 0px;
+    }
+
+    /* Nose */
+    .panda-nose {
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 7px;
+      background: #2d2d2d;
+      border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+      z-index: 5;
+    }
+
+    /* Mouth */
+    .panda-mouth {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 8px;
+      z-index: 5;
+      transition: all 0.3s ease;
+    }
+    .panda-mouth::before,
+    .panda-mouth::after {
+      content: '';
+      position: absolute;
+      width: 9px;
+      height: 8px;
+      border-bottom: 2.5px solid #2d2d2d;
+      border-radius: 0 0 50% 50%;
+      top: 0;
+      transition: all 0.3s ease;
+    }
+    .panda-mouth::before { left: 0; }
+    .panda-mouth::after { right: 0; }
+
+    /* Cheeks (blush) */
+    .panda-cheek {
+      position: absolute;
+      width: 14px;
+      height: 9px;
+      background: rgba(255, 150, 150, 0.35);
+      border-radius: 50%;
+      top: 36px;
+      z-index: 4;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    .panda-cheek.left { left: 5px; }
+    .panda-cheek.right { right: 5px; }
+
+    /* Body */
+    .panda-body {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 58px;
+      height: 48px;
+      background: #fff;
+      border-radius: 50% 50% 40% 40%;
+      border: 2.5px solid #2d2d2d;
+      z-index: 1;
+    }
+    /* Belly */
+    .panda-body::after {
+      content: '';
+      position: absolute;
+      width: 32px;
+      height: 28px;
+      background: #f0f0f0;
+      border-radius: 50%;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Arms */
+    .panda-arm {
+      position: absolute;
+      width: 18px;
+      height: 30px;
+      background: #2d2d2d;
+      border-radius: 40% 40% 50% 50%;
+      bottom: 12px;
+      z-index: 0;
+      transition: transform 0.3s ease;
+    }
+    .panda-arm.left {
+      left: 5px;
+      transform: rotate(10deg);
+      transform-origin: top center;
+    }
+    .panda-arm.right {
+      right: 5px;
+      transform: rotate(-10deg);
+      transform-origin: top center;
+    }
+
+    /* Feet */
+    .panda-foot {
+      position: absolute;
+      width: 20px;
+      height: 12px;
+      background: #2d2d2d;
+      border-radius: 50% 50% 50% 50%;
+      bottom: -4px;
+      z-index: 0;
+    }
+    .panda-foot.left { left: 12px; }
+    .panda-foot.right { right: 12px; }
+
+    /* ===== SHADOW ===== */
+    .panda-shadow {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 10px;
+      background: radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    /* ===== SPARKLES (success state) ===== */
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+    .sparkle::before,
+    .sparkle::after {
+      content: '';
+      position: absolute;
+      background: #ffd700;
+      border-radius: 2px;
+    }
+    .sparkle::before {
+      width: 2px;
+      height: 8px;
+      top: 0;
+      left: 3px;
+    }
+    .sparkle::after {
+      width: 8px;
+      height: 2px;
+      top: 3px;
+      left: 0;
+    }
+    .sparkle:nth-child(1) { top: 5px; left: 20px; }
+    .sparkle:nth-child(2) { top: 0; right: 25px; }
+    .sparkle:nth-child(3) { top: 30px; left: 8px; }
+    .sparkle:nth-child(4) { top: 25px; right: 10px; }
+    .sparkle:nth-child(5) { top: 55px; left: 15px; }
+    .sparkle:nth-child(6) { top: 50px; right: 18px; }
+
+    /* Question mark (error state) */
+    .question-mark {
+      position: absolute;
+      top: -10px;
+      right: 12px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ef4444;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 10;
+      transform: scale(0);
+    }
+
+    /* ===== LOADING ANIMATION ===== */
+    @keyframes pandaBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      25% { transform: translateX(-50%) translateY(-14px) rotate(-3deg); }
+      50% { transform: translateX(-50%) translateY(0); }
+      75% { transform: translateX(-50%) translateY(-14px) rotate(3deg); }
+    }
+    @keyframes shadowPulse {
+      0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.12; }
+      25%, 75% { transform: translateX(-50%) scaleX(0.7); opacity: 0.06; }
+    }
+    @keyframes armWave {
+      0%, 100% { transform: rotate(10deg); }
+      50% { transform: rotate(-15deg); }
+    }
+    @keyframes armWaveRight {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(15deg); }
+    }
+
+    /* ===== SUCCESS ANIMATION ===== */
+    @keyframes successBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+      50% { transform: translateX(-50%) translateY(-20px) scale(1.05); }
+    }
+    @keyframes sparkleIn {
+      0% { opacity: 0; transform: scale(0) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1.2) rotate(90deg); }
+      100% { opacity: 0; transform: scale(0) rotate(180deg); }
+    }
+
+    /* ===== ERROR ANIMATION ===== */
+    @keyframes headTilt {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(12deg); }
+    }
+    @keyframes questionPop {
+      0% { opacity: 0; transform: scale(0) translateY(5px); }
+      60% { opacity: 1; transform: scale(1.3) translateY(-2px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ===== STATE: IDLE ===== */
+    .state-idle .panda { animation: none; }
+    .state-idle .panda-shadow { animation: none; }
+
+    /* ===== STATE: LOADING ===== */
+    .state-loading .panda {
+      animation: pandaBounce 1s cubic-bezier(.34,1.56,.64,1) infinite;
+    }
+    .state-loading .panda-shadow {
+      animation: shadowPulse 1s ease-in-out infinite;
+    }
+    .state-loading .panda-arm.left {
+      animation: armWave 0.5s ease-in-out infinite;
+    }
+    .state-loading .panda-arm.right {
+      animation: armWaveRight 0.5s ease-in-out infinite;
+    }
+
+    /* ===== STATE: SUCCESS ===== */
+    .state-success .panda {
+      animation: successBounce 0.6s cubic-bezier(.34,1.56,.64,1) 2;
+    }
+    .state-success .panda-cheek { opacity: 1; }
+    .state-success .panda-mouth::before {
+      border-bottom-width: 3px;
+      height: 10px;
+    }
+    .state-success .panda-mouth::after {
+      border-bottom-width: 3px;
+      height: 10px;
+    }
+    .state-success .panda-eye {
+      height: 4px;
+      border-radius: 0 0 50% 50%;
+      overflow: hidden;
+    }
+    .state-success .panda-eye .pupil { opacity: 0; }
+    .state-success .sparkle {
+      animation: sparkleIn 0.8s ease-out forwards;
+    }
+    .state-success .sparkle:nth-child(1) { animation-delay: 0s; }
+    .state-success .sparkle:nth-child(2) { animation-delay: 0.1s; }
+    .state-success .sparkle:nth-child(3) { animation-delay: 0.2s; }
+    .state-success .sparkle:nth-child(4) { animation-delay: 0.3s; }
+    .state-success .sparkle:nth-child(5) { animation-delay: 0.15s; }
+    .state-success .sparkle:nth-child(6) { animation-delay: 0.25s; }
+    .state-success .panda-arm.left { transform: rotate(-40deg); }
+    .state-success .panda-arm.right { transform: rotate(40deg); }
+
+    /* ===== STATE: ERROR ===== */
+    .state-error .panda-head {
+      animation: headTilt 1.5s ease-in-out infinite;
+    }
+    .state-error .question-mark {
+      animation: questionPop 0.5s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    .state-error .panda-eye .pupil {
+      transform: translate(-30%, -50%);
+    }
+    .state-error .panda-mouth::before,
+    .state-error .panda-mouth::after {
+      border-bottom: none;
+    }
+    .state-error .panda-mouth {
+      width: 10px;
+      height: 10px;
+      top: 39px;
+    }
+    .state-error .panda-mouth::before {
+      width: 10px;
+      height: 10px;
+      border: 2.5px solid #2d2d2d;
+      border-radius: 50%;
+      left: 0;
+    }
+    .state-error .panda-mouth::after {
+      display: none;
+    }
+
+    /* ===== STATUS TEXT ===== */
+    .status-area {
+      text-align: center;
+      min-height: 52px;
+      margin-bottom: 24px;
+      transition: all 0.4s ease;
+    }
+    .status-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555e70;
+      line-height: 1.5;
+      transition: all 0.3s ease;
+    }
+    .state-loading .status-text { color: #6c63ff; }
+    .state-success .status-text { color: #22c55e; }
+    .state-error .status-text { color: #ef4444; }
+
+    /* Dots animation */
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0% { content: ''; }
+      25% { content: '.'; }
+      50% { content: '..'; }
+      75% { content: '...'; }
+    }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: #e8ebf0;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .state-loading .progress-container { opacity: 1; }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #6c63ff, #3b82f6, #6c63ff);
+      background-size: 200% 100%;
+      border-radius: 100px;
+      animation: progressShimmer 1.5s ease-in-out infinite;
+      transition: width 0.4s ease;
+    }
+    .state-loading .progress-bar {
+      width: 100%;
+      animation: progressIndeterminate 1.8s ease-in-out infinite, progressShimmer 1.5s ease-in-out infinite;
+    }
+    .state-success .progress-container { opacity: 1; }
+    .state-success .progress-bar {
+      width: 100%;
+      background: #22c55e;
+      animation: none;
+    }
+    @keyframes progressIndeterminate {
+      0% { width: 0%; margin-left: 0%; }
+      50% { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+    @keyframes progressShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ===== BUTTON ===== */
+    .btn-container {
+      width: 100%;
+    }
+    .btn-format {
+      width: 100%;
+      padding: 13px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #6c63ff 0%, #3b82f6 100%);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);
+    }
+    .btn-format:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(108, 99, 255, 0.35);
+    }
+    .btn-format:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(108, 99, 255, 0.2);
+    }
+    .btn-format:disabled {
+      background: #c7c9d1;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-format::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+    }
+    .btn-format:hover:not(:disabled)::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Icon inside button */
+    .btn-icon {
+      margin-right: 6px;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+
+    /* ===== RETRY BUTTON ===== */
+    .btn-retry {
+      display: none;
+      width: 100%;
+      padding: 13px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ef4444;
+      background: #fff;
+      border: 2px solid #fecaca;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+    .btn-retry:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+    .state-error .btn-retry { display: block; }
+
+    /* ===== ERROR DETAILS ===== */
+    .error-details {
+      display: none;
+      font-size: 11.5px;
+      color: #9ca3af;
+      margin-top: 6px;
+      padding: 8px 12px;
+      background: #fef2f2;
+      border-radius: 8px;
+      word-break: break-word;
+      border: 1px solid #fecaca;
+    }
+    .state-error .error-details { display: block; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      margin-top: 32px;
+      text-align: center;
+      font-size: 11px;
+      color: #adb5c4;
+      letter-spacing: 0.2px;
+    }
+    .footer span {
+      color: #6c63ff;
+      font-weight: 600;
+    }
+
+    /* ===== FADE TRANSITIONS ===== */
+    .fade-enter {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .fade-active {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>🐼 <span>DocPo</span> Formatter</h1>
+      <p>Smart document formatting </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Panda Stage -->
+    <div class="panda-stage" id="pandaStage">
+      <!-- Sparkles (visible on success) -->
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+      <div class="sparkle"></div>
+
+      <!-- Question Mark (visible on error) -->
+      <div class="question-mark" id="questionMark">?</div>
+
+      <!-- The Panda -->
+      <div class="panda" id="panda">
+        <!-- Head -->
+        <div class="panda-head">
+          <!-- Ears -->
+          <div class="panda-ear left"></div>
+          <div class="panda-ear right"></div>
+
+          <!-- Eye patches -->
+          <div class="panda-eye-patch left">
+            <div class="panda-eye"><div class="pupil"></div></div>
+          </div>
+          <div class="panda-eye-patch right">
+            <div class="panda-eye"><div class="pupil"></div></div>
+          </div>
+
+          <!-- Nose -->
+          <div class="panda-nose"></div>
+
+          <!-- Mouth -->
+          <div class="panda-mouth"></div>
+
+          <!-- Cheeks -->
+          <div class="panda-cheek left"></div>
+          <div class="panda-cheek right"></div>
+        </div>
+
+        <!-- Body -->
+        <div class="panda-body"></div>
+
+        <!-- Arms -->
+        <div class="panda-arm left"></div>
+        <div class="panda-arm right"></div>
+
+        <!-- Feet -->
+        <div class="panda-foot left"></div>
+        <div class="panda-foot right"></div>
+      </div>
+
+      <!-- Shadow -->
+      <div class="panda-shadow"></div>
+    </div>
+
+    <!-- Status Text -->
+    <div class="status-area" id="statusArea">
+      <div class="status-text" id="statusText">Ready to format your document </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-container">
+      <button class="btn-format" id="btnFormat" onclick="runFormatting()">
+        <span class="btn-icon"></span> Format Document
+      </button>
+
+      <button class="btn-format" style="margin-top:10px; background:#f0f0f0; color:#333; box-shadow:none;" onclick="openPrompt()">
+        <span class="btn-icon">⧉</span> AI Prompt
+      </button>
+
+      <button class="btn-retry" id="btnRetry" onclick="runFormatting()">
+        🔄 Try Again
+      </button>
+    </div>
+
+    <!-- Error Details -->
+    <div class="error-details" id="errorDetails"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      Powered by <span>DocPo</span>
+    </div>
+  </div>
+
+  <script>
+    // ===== STATE MANAGEMENT =====
+    var currentState = 'idle'; // idle | loading | success | error
+
+    var pandaStage = document.getElementById('pandaStage');
+    var statusText = document.getElementById('statusText');
+    var btnFormat = document.getElementById('btnFormat');
+    var btnRetry = document.getElementById('btnRetry');
+    var errorDetails = document.getElementById('errorDetails');
+    var sidebar = document.getElementById('sidebar');
+
+    function setState(state) {
+      // Remove all state classes
+      sidebar.classList.remove('state-idle', 'state-loading', 'state-success', 'state-error');
+      sidebar.classList.add('state-' + state);
+      currentState = state;
+    }
+
+
+    // ===== EXPOSED FUNCTIONS =====
+
+    /**
+     * Start loading state — panda bounces, progress bar animates
+     */
+    function startLoading() {
+      setState('loading');
+      statusText.innerHTML = 'formatting your document<span class="loading-dots"></span>';
+      btnFormat.disabled = true;
+      btnFormat.innerHTML = '<span class="btn-icon">⏳</span> Formatting...';
+      errorDetails.style.display = 'none';
+      errorDetails.textContent = '';
+    }
+
+    /**
+     * Show success state — panda celebrates with sparkles
+     */
+    function showSuccess() {
+      setState('success');
+      statusText.textContent = '🎉 Formatting complete!';
+      btnFormat.disabled = false;
+      btnFormat.innerHTML = '<span class="btn-icon">✨</span> Format Again';
+    }
+
+    /**
+     * Show error state — panda tilts head with question mark
+     * @param {string} message - Error message to display
+     */
+    function showError(message) {
+      setState('error');
+      statusText.textContent = '😕 Something went wrong...';
+      btnFormat.disabled = false;
+      btnFormat.innerHTML = '<span class="btn-icon">✨</span> Format Document';
+      if (message) {
+        errorDetails.textContent = message;
+        errorDetails.style.display = 'block';
+      }
+    }
+
+    /**
+     * Reset to idle state
+     */
+    function resetState() {
+      setState('idle');
+      statusText.textContent = 'Ready to format your document ✨';
+      btnFormat.disabled = false;
+      btnFormat.innerHTML = '<span class="btn-icon">✨</span> Format Document';
+      errorDetails.style.display = 'none';
+      errorDetails.textContent = '';
+    }
+
+    // ===== GOOGLE APPS SCRIPT INTEGRATION =====
+
+    /**
+     * Main function: triggers the formatting via Apps Script
+     */
+    function runFormatting() {
+      startLoading();
+
+      google.script.run
+        .withSuccessHandler(function() {
+          setTimeout(showSuccess, 300);
+        })
+        .withFailureHandler(function(err) {
+          showError(err.message || err);
+        })
+        .runDocPo();
+    }
+  
+    function openPrompt() {
+      google.script.run.showProposalPrompt();
+    }
+    // ===== INIT =====
+    setState('idle');
+  </script>
+
+</body>
+</html>
