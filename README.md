@@ -73,7 +73,7 @@ DocPo runs inside Google Docs using Apps Script.
 
 ## 👤 Author
 
-Developed by **<Your Name>** during tenure at **<Company Name>**.
+Developed by **<Prikshit Singh>** during tenure at **<ConveGenius.Ai>**.
 
 Shared for internal use and further development.
 
